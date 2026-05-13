@@ -1,0 +1,39 @@
+{
+  "name": "epms-api",
+  "version": "1.0.0",
+  "description": "",
+  "keywords": [
+    "EPMS_API"
+  ],
+  "homepage": "https://github.com/Anco-Sam-Franco-B/Employee-Payroll-Management-system--EPMS-#readme",
+  "bugs": {
+    "url": "https://github.com/Anco-Sam-Franco-B/Employee-Payroll-Management-system--EPMS-/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Anco-Sam-Franco-B/Employee-Payroll-Management-system--EPMS-.git"
+  },
+  "license": "ISC",
+  "author": "Sam Franco BYIRINGIRO",
+  "type": "module",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "express-session": "^1.19.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.10.1",
+    "multer": "^2.1.1",
+    "mysql2": "^3.22.3",
+    "pg": "^8.20.0"
+  },
+  "devDependencies": {
+    "dotenv": "^17.4.2",
+    "nodemon": "^3.1.14"
+  }
+}
