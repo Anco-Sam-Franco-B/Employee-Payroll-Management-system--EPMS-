@@ -1,4 +1,5 @@
 import { Bell, Search, Settings, UserCircle } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function TopNavBar() {
   return (
@@ -22,24 +23,15 @@ export default function TopNavBar() {
         {/* Right - Actions */}
         <div className="flex items-center gap-3" data-aos="fade-zome-in">
 
-          {/* Notifications */}
-          <button className="relative p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition">
-            <Bell className="size-5 text-slate-700" />
-            <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-          </button>
 
-          {/* Settings */}
-          <button className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 transition">
-            <Settings className="size-5 text-slate-700" />
-          </button>
 
           {/* Profile */}
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200 transition cursor-pointer">
+          <Link to='/profile' className="flex items-center gap-2 px-3 py-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200 transition cursor-pointer">
             <UserCircle className="size-6 text-slate-700" />
             <span className="text-sm font-medium text-slate-700 hidden sm:block">
               Admin
             </span>
-          </div>
+          </Link>
 
         </div>
       </div>

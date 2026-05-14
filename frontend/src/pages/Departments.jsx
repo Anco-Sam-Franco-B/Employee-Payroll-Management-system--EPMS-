@@ -1,4 +1,5 @@
-import { Building2, Plus, Users, Pencil, Trash2 } from "lucide-react";
+import { Building2, Plus, Users, Pencil, Trash2, PlusIcon } from "lucide-react";
+import { Link } from "react-router-dom";
 
 export default function Departments() {
   const departments = [
@@ -23,10 +24,10 @@ export default function Departments() {
           </p>
         </div>
 
-        <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md hover:scale-105 transition">
+        <Link to='/create-department' className="flex items-center gap-2 px-4 py-2 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 text-white shadow-md hover:scale-105 transition">
           <Plus className="size-4" />
           Add Department
-        </button>
+        </Link>
       </div>
 
       {/* Department Cards */}
@@ -35,6 +36,7 @@ export default function Departments() {
         {departments.map((dept, index) => (
           <div
             key={index}
+            data-aos="fade-in"
             className="bg-white border rounded-2xl p-5 shadow-sm hover:shadow-lg transition group"
           >
             {/* Icon + Title */}
@@ -63,6 +65,11 @@ export default function Departments() {
                 Edit
               </button>
 
+              <button className="flex items-center gap-2 text-blue-500 text-sm px-3 py-1.5 rounded-lg bg-blue-100 hover:bg-slate-200 transition">
+                <PlusIcon className="size-4" />
+                Employee
+              </button>
+
               <button className="flex items-center gap-2 text-sm px-3 py-1.5 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 transition">
                 <Trash2 className="size-4" />
                 Delete
@@ -70,11 +77,6 @@ export default function Departments() {
             </div>
           </div>
         ))}
-      </div>
-
-      {/* Empty State (optional UI pattern) */}
-      <div className="mt-10 text-center text-slate-400 text-sm">
-        <p>Tip: You can connect this page to your backend API to load real departments.</p>
       </div>
     </div>
   );
