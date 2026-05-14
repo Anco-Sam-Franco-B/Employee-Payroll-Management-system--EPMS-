@@ -83,10 +83,13 @@ export const updateDep=async(req, res)=>{
     })
 
     try {
-        db.query(`UPDATE FROM department SET dep_code='${depCode}', dep_name='${depName}',  gross_salary='${grossSalary}', total_deduction='${totalDeduction}' WHERE id='${depId}'`, err=>{
+        db.query(`UPDATE department SET dep_code='${depCode}', dep_name='${depName}',  gross_salary='${grossSalary}', total_deduction='${totalDeduction}' WHERE id='${depId}'`, err=>{
             if(err) return res.status(500).json({
                 message: 'Something went wrong during updating department details',
                 errorMessage: err.message
+            })
+            return res.status(200).json({
+                message: 'Department updated!'
             })
         })
     } catch (error) {

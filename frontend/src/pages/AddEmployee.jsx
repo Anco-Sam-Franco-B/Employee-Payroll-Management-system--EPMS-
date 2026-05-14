@@ -1,48 +1,75 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   User,
-  Mail,
   Phone,
   Building2,
   Briefcase,
   Calendar,
   MapPin,
-  DollarSign,
-  Shield,
+  Loader2,
 } from "lucide-react";
+import { useStore } from "../store/useStore";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function AddEmployeeForm() {
+  const { departments, fetchDepartments, addEmployee, isLoading } = useStore();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
-    fullName: "",
-    email: "",
-    phone: "",
-    department: "IT",
-    role: "",
-    joinDate: "",
+    fname: "",
+    lname: "",
+    position: "",
     address: "",
-    salary: "",
-    status: "Active",
+    telphone: "",
     gender: "Male",
-    employeeType: "Full-time",
+    heredDate: "",
+    depId: "",
   });
+
+  useEffect(() => {
+    fetchDepartments();
+  }, [fetchDepartments]);
+
+  // Set default department once loaded
+  useEffect(() => {
+    if (departments.length > 0 && !form.depId) {
+      setForm((prev) => ({ ...prev, depId: departments[0].id }));
+    }
+  }, [departments, form.depId]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Employee Data:", form);
+    if (!form.fname || !form.lname || !form.depId) {
+      return toast.error("Please fill in all required fields");
+    }
+
+    const res = await addEmployee(form.depId, form);
+    if (res.success) {
+      toast.success("Employee added successfully!");
+      navigate("/employees");
+    } else {
+      toast.error(res.message || "Failed to add employee");
+    }
   };
+
+  if (isLoading && departments.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Loader2 className="animate-spin size-8 text-blue-500" />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen p-6 flex items-center justify-center">
-
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-5xl bg-white border rounded-2xl shadow-xl p-6"
       >
-
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
@@ -56,178 +83,137 @@ export default function AddEmployeeForm() {
 
         {/* Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-
-          {/* Full Name */}
+          {/* First Name */}
           <div>
-            <label className="text-sm text-slate-600">Full Name</label>
+            <label className="text-sm text-slate-600 font-medium">First Name</label>
             <input
-              name="fullName"
-              value={form.fullName}
+              name="fname"
+              required
+              value={form.fname}
               onChange={handleChange}
-              placeholder="John Doe"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+              placeholder="John"
+              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
             />
           </div>
 
-          {/* Email */}
+          {/* Last Name */}
           <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Mail className="size-4" /> Email
-            </label>
+            <label className="text-sm text-slate-600 font-medium">Last Name</label>
             <input
-              type="email"
-              name="email"
-              value={form.email}
+              name="lname"
+              required
+              value={form.lname}
               onChange={handleChange}
-              placeholder="john@example.com"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+              placeholder="Doe"
+              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
             />
           </div>
 
           {/* Phone */}
           <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
+            <label className="text-sm text-slate-600 font-medium flex items-center gap-1">
               <Phone className="size-4" /> Phone
             </label>
             <input
-              name="phone"
-              value={form.phone}
+              name="telphone"
+              required
+              value={form.telphone}
               onChange={handleChange}
               placeholder="+250 7xx xxx xxx"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
             />
           </div>
 
           {/* Department */}
           <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
+            <label className="text-sm text-slate-600 font-medium flex items-center gap-1">
               <Building2 className="size-4" /> Department
             </label>
             <select
-              name="department"
-              value={form.department}
+              name="depId"
+              required
+              value={form.depId}
               onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
             >
-              <option>IT</option>
-              <option>HR</option>
-              <option>Finance</option>
-              <option>Marketing</option>
-              <option>Operations</option>
+              {departments.map((dept) => (
+                <option key={dept.id} value={dept.id}>
+                  {dept.dep_name}
+                </option>
+              ))}
             </select>
           </div>
 
           {/* Role */}
           <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
+            <label className="text-sm text-slate-600 font-medium flex items-center gap-1">
               <Briefcase className="size-4" /> Role
             </label>
             <input
-              name="role"
-              value={form.role}
+              name="position"
+              required
+              value={form.position}
               onChange={handleChange}
               placeholder="Software Engineer"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
             />
           </div>
 
           {/* Join Date */}
           <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
+            <label className="text-sm text-slate-600 font-medium flex items-center gap-1">
               <Calendar className="size-4" /> Join Date
             </label>
             <input
               type="date"
-              name="joinDate"
-              value={form.joinDate}
+              name="heredDate"
+              required
+              value={form.heredDate}
               onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
-
-          {/* Salary */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <DollarSign className="size-4" /> Salary
-            </label>
-            <input
-              type="number"
-              name="salary"
-              value={form.salary}
-              onChange={handleChange}
-              placeholder="1000"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
             />
           </div>
 
           {/* Gender */}
           <div>
-            <label className="text-sm text-slate-600">Gender</label>
+            <label className="text-sm text-slate-600 font-medium">Gender</label>
             <select
               name="gender"
+              required
               value={form.gender}
               onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
             >
               <option>Male</option>
               <option>Female</option>
-            </select>
-          </div>
-
-          {/* Employee Type */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Shield className="size-4" /> Employee Type
-            </label>
-            <select
-              name="employeeType"
-              value={form.employeeType}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            >
-              <option>Full-time</option>
-              <option>Part-time</option>
-              <option>Contract</option>
-              <option>Intern</option>
-            </select>
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="text-sm text-slate-600">Status</label>
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            >
-              <option>Active</option>
-              <option>Inactive</option>
             </select>
           </div>
         </div>
 
         {/* Address */}
         <div className="mt-4">
-          <label className="text-sm text-slate-600 flex items-center gap-1">
+          <label className="text-sm text-slate-600 font-medium flex items-center gap-1">
             <MapPin className="size-4" /> Address
           </label>
           <textarea
             name="address"
+            required
             value={form.address}
             onChange={handleChange}
             rows="3"
             placeholder="Kigali, Rwanda..."
-            className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+            className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
           />
         </div>
 
         {/* Submit */}
         <button
           type="submit"
-          className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold shadow-md hover:scale-105 transition"
+          disabled={isLoading}
+          className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold shadow-md hover:scale-105 transition disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2"
         >
-          Save Employee
+          {isLoading && <Loader2 className="animate-spin size-4" />}
+          {isLoading ? "Saving..." : "Save Employee"}
         </button>
       </form>
     </div>

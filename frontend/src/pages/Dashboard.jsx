@@ -1,6 +1,14 @@
+import { useEffect } from "react";
 import { Users, Building2, HandCoins, FileText, TrendingUp } from "lucide-react";
+import { useStore } from "../store/useStore";
 
 export default function Dashboard() {
+  const { stats, fetchStats } = useStore();
+
+  useEffect(() => {
+    fetchStats();
+  }, [fetchStats]);
+
   return (
     <div className="p-6 min-h-screen">
 
@@ -23,7 +31,7 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-slate-500 text-sm">Employees</p>
-            <h2 className="text-xl font-bold">1,240</h2>
+            <h2 className="text-xl font-bold">{stats?.totalEmployees || 0}</h2>
           </div>
         </div>
 
@@ -33,7 +41,7 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-slate-500 text-sm">Departments</p>
-            <h2 className="text-xl font-bold">12</h2>
+            <h2 className="text-xl font-bold">{stats?.totalDepartments || 0}</h2>
           </div>
         </div>
 
@@ -42,8 +50,8 @@ export default function Dashboard() {
             <HandCoins className="text-emerald-600" />
           </div>
           <div>
-            <p className="text-slate-500 text-sm">Monthly Payroll</p>
-            <h2 className="text-xl font-bold">$45,200</h2>
+            <p className="text-slate-500 text-sm">Total Payroll</p>
+            <h2 className="text-xl font-bold">${stats?.totalPayroll?.toLocaleString() || 0}</h2>
           </div>
         </div>
 
@@ -53,7 +61,7 @@ export default function Dashboard() {
           </div>
           <div>
             <p className="text-slate-500 text-sm">Reports</p>
-            <h2 className="text-xl font-bold">36</h2>
+            <h2 className="text-xl font-bold">{stats?.totalReports || 0}</h2>
           </div>
         </div>
       </div>
@@ -68,8 +76,21 @@ export default function Dashboard() {
             <TrendingUp className="text-green-500" />
           </div>
 
-          <div className="h-64 flex items-center justify-center text-slate-400 border-dashed border-2 rounded-xl">
-            Chart Area (Recharts / Chart.js here)
+          <div className="space-y-4 mt-4">
+            {stats?.departmentDistribution?.map((item, index) => (
+              <div key={index}>
+                <div className="flex justify-between text-sm mb-1">
+                  <span className="text-slate-600 font-medium">{item.dep_name}</span>
+                  <span className="text-slate-400">{item.count} employees</span>
+                </div>
+                <div className="w-full bg-slate-100 rounded-full h-2">
+                  <div 
+                    className="bg-blue-500 h-2 rounded-full transition-all duration-500" 
+                    style={{ width: `${(item.count / (stats.totalEmployees || 1)) * 100}%` }}
+                  ></div>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -80,19 +101,19 @@ export default function Dashboard() {
           </h2>
 
           <div className="space-y-3 text-sm">
-            <div className="p-3 bg-slate-50 rounded-xl">
-              New employee added
-            </div>
-            <div className="p-3 bg-slate-50 rounded-xl">
-              Payroll processed successfully
-            </div>
-            <div className="p-3 bg-slate-50 rounded-xl">
-              Department updated
-            </div>
+            {stats?.recentActivities?.length > 0 ? (
+              stats.recentActivities.map((activity, index) => (
+                <div key={index} className="p-3 bg-slate-50 rounded-xl">
+                  {activity.message}
+                </div>
+              ))
+            ) : (
+              <p className="text-slate-400 text-center py-4">No recent activity</p>
+            )}
           </div>
         </div>
       </div>
 
     </div>
   );
-}
+}

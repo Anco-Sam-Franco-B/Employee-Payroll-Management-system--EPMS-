@@ -113,13 +113,38 @@ export const deleteEmp=async(req, res)=>{
         message: 'Employee ID is required to delete employee details'
     })
     try {
-        db.query(`SELECT * FROM employee WHERE id='${empId}'`, (err)=>{
+        db.query(`DELETE FROM employee WHERE id='${empId}'`, (err)=>{
             if(err) return res.status(500).json({
                 message: 'Something went wrong during deleting emploeyee data',
                 errorMessage: err.message
             })
             return res.status(200).json({
                 message: 'Employee deleted!'
+            })
+        })
+    } catch (error) {
+        return res.status(500).json({
+            message: 'Internal Server Error',
+            errorMessage: error.message
+        })
+    }
+}
+
+export const updateEmp=async(req, res)=>{
+    const {empId}=req.params
+    if(!empId) return res.status(400).json({
+        message: 'Employee ID is required to update employee details'
+    })
+    const { fname, lname, position, address, telphone, gender, heredDate, depId }=req.body
+    
+    try {
+        db.query(`UPDATE employee SET fname='${fname}', lname='${lname}', position='${position}', address='${address}', telephone='${telphone}', gender='${gender}', hered_date='${heredDate}', dep_id='${depId}' WHERE id='${empId}'`, err=>{
+            if(err) return res.status(500).json({
+                message: 'Something went wrong during updating employee!',
+                errorMessage: err.message
+            })
+            return res.status(200).json({
+                message: 'Employee updated!'
             })
         })
     } catch (error) {

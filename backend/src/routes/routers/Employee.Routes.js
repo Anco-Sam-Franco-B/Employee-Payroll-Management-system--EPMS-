@@ -1,5 +1,5 @@
 import express from 'express'
-import { createEmp, deleteEmp, ViewDepEmp, ViewEmp, ViewEmpDetail } from '../../controllers/Employee.Controller.js'
+import { createEmp, deleteEmp, updateEmp, ViewDepEmp, ViewEmp, ViewEmpDetail } from '../../controllers/Employee.Controller.js'
 
 const empRoutes=express.Router()
 
@@ -7,6 +7,7 @@ empRoutes.get('/', ViewEmp)
 empRoutes.get('/:empId', ViewEmpDetail)
 empRoutes.get('/dep/:depId/emp', ViewDepEmp)
 empRoutes.post('/create/:depId/emp', createEmp)
+empRoutes.put('/update/:empId', updateEmp)
 empRoutes.delete('/delete/:empId', deleteEmp)
 
 

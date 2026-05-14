@@ -1,235 +1,171 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   FileText,
   Calendar,
-  Filter,
   Building2,
-  User,
-  BarChart3,
+  Filter,
+  Loader2,
 } from "lucide-react";
+import { useStore } from "../store/useStore";
+import toast from "react-hot-toast";
 
 export default function ReportForm() {
+  const { departments, fetchDepartments } = useStore();
+  const [loading, setLoading] = useState(false);
   const [form, setForm] = useState({
-    title: "",
-    type: "Payroll",
     department: "All",
-    employee: "All",
     status: "All",
     fromDate: "",
     toDate: "",
-    format: "PDF",
   });
+
+  useEffect(() => {
+    fetchDepartments();
+  }, [fetchDepartments]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleGenerate   = async () => {
-  const response = await fetch("http://localhost:5000/api/reports/pdf", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      department: form.department,
-      status: form.status,
-      fromDate: form.fromDate,
-      toDate: form.toDate,
-    }),
-  });
+  const handleGenerate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const response = await fetch("http://localhost:5000/api/reports/pdf", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(form),
+      });
 
-  const blob = await response.blob();
+      if (!response.ok) throw new Error("Failed to generate report");
 
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "epms-report.pdf";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-};
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `EPMS_Report_${new Date().toLocaleDateString()}.pdf`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      toast.success("Report generated successfully!");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error generating report");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 p-6 flex items-center justify-center">
-
       <form
-        className="w-full max-w-3xl bg-white border rounded-2xl shadow-lg p-6"
+        onSubmit={handleGenerate}
+        className="w-full max-w-2xl bg-white border rounded-2xl shadow-lg p-8"
       >
-
         {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
-            <FileText className="text-blue-500" />
-            Generate Report
+        <div className="mb-8 text-center">
+          <div className="size-16 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <FileText size={32} />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-800">
+            Generate Payroll Report
           </h1>
-          <p className="text-slate-500 text-sm">
-            Configure filters to generate system reports
+          <p className="text-slate-500 text-sm mt-1">
+            Download a detailed PDF report of salary records
           </p>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {/* Filters */}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Department */}
+            <div>
+              <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+                <Building2 className="size-4" /> Department
+              </label>
+              <select
+                name="department"
+                value={form.department}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+              >
+                <option value="All">All Departments</option>
+                {departments.map((d) => (
+                  <option key={d.id} value={d.dep_name}>
+                    {d.dep_name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-          {/* Report Title */}
-          <div>
-            <label className="text-sm text-slate-600">Report Title</label>
-            <input
-              name="title"
-              value={form.title}
-              onChange={handleChange}
-              placeholder="e.g. Monthly Payroll Report"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100 outline-none"
-            />
+            {/* Status */}
+            <div>
+              <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+                <Filter className="size-4" /> Payment Status
+              </label>
+              <select
+                name="status"
+                value={form.status}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+              >
+                <option value="All">All Status</option>
+                <option value="Paid">Paid Only</option>
+                <option value="Pending">Pending Only</option>
+              </select>
+            </div>
           </div>
 
-          {/* Report Type */}
-          <div>
-            <label className="text-sm text-slate-600">Report Type</label>
-            <select
-              name="type"
-              value={form.type}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            >
-              <option>Payroll</option>
-              <option>Attendance</option>
-              <option>Performance</option>
-              <option>Employee Summary</option>
-            </select>
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* From Date */}
+            <div>
+              <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+                <Calendar className="size-4" /> From Date
+              </label>
+              <input
+                type="date"
+                name="fromDate"
+                value={form.fromDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+              />
+            </div>
 
-          {/* Department */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Building2 className="size-4" /> Department
-            </label>
-            <select
-              name="department"
-              value={form.department}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            >
-              <option>All</option>
-              <option>IT</option>
-              <option>HR</option>
-              <option>Finance</option>
-              <option>Marketing</option>
-            </select>
-          </div>
-
-          {/* Employee */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <User className="size-4" /> Employee
-            </label>
-            <select
-              name="employee"
-              value={form.employee}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            >
-              <option>All</option>
-              <option>John Doe</option>
-              <option>Sarah Kim</option>
-              <option>Ali Hassan</option>
-            </select>
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="text-sm text-slate-600">
-              Status
-            </label>
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            >
-              <option>All</option>
-              <option>Generated</option>
-              <option>Pending</option>
-            </select>
-          </div>
-
-          {/* Format */}
-          <div>
-            <label className="text-sm text-slate-600">
-              Export Format
-            </label>
-            <select
-              name="format"
-              value={form.format}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            >
-              <option>PDF</option>
-              <option>Excel</option>
-              <option>CSV</option>
-            </select>
-          </div>
-
-          {/* From Date */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Calendar className="size-4" /> From Date
-            </label>
-            <input
-              type="date"
-              name="fromDate"
-              value={form.fromDate}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
-
-          {/* To Date */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Calendar className="size-4" /> To Date
-            </label>
-            <input
-              type="date"
-              name="toDate"
-              value={form.toDate}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
-        </div>
-
-        {/* Advanced Options */}
-        <div className="mt-5 p-4 bg-slate-50 border rounded-xl">
-          <h2 className="text-sm font-semibold text-slate-700 flex items-center gap-2">
-            <Filter className="size-4" />
-            Advanced Options
-          </h2>
-
-          <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-600">
-            <label className="flex items-center gap-2">
-              <input type="checkbox" />
-              Include Salary Breakdown
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input type="checkbox" />
-              Include Attendance Data
-            </label>
-
-            <label className="flex items-center gap-2">
-              <input type="checkbox" />
-              Include Bonuses & Deductions
-            </label>
+            {/* To Date */}
+            <div>
+              <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+                <Calendar className="size-4" /> To Date
+              </label>
+              <input
+                type="date"
+                name="toDate"
+                value={form.toDate}
+                onChange={handleChange}
+                className="w-full px-4 py-2.5 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+              />
+            </div>
           </div>
         </div>
 
         {/* Submit */}
         <button
           type="submit"
-          className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold shadow-md hover:scale-105 transition"
+          disabled={loading}
+          className="mt-10 w-full py-4 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold shadow-xl hover:shadow-2xl hover:scale-[1.02] active:scale-[0.98] transition disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-3"
         >
-          Generate Report
+          {loading ? (
+            <Loader2 className="animate-spin size-5" />
+          ) : (
+            <FileText className="size-5" />
+          )}
+          {loading ? "Generating PDF..." : "Generate PDF Report"}
         </button>
+
+        <p className="mt-6 text-center text-xs text-slate-400">
+          The report will include employee names, departments, gross salary, deductions, and net payouts.
+        </p>
       </form>
     </div>
   );

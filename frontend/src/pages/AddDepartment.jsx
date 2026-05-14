@@ -1,212 +1,119 @@
 import { useState } from "react";
 import {
   Building2,
-  User,
-  Mail,
-  Hash,
   DollarSign,
-  Calendar,
-  FileText,
-  Shield,
+  Briefcase,
+  Loader2,
 } from "lucide-react";
+import { useStore } from "../store/useStore";
+import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function AddDepartmentForm() {
+  const { addDepartment, isLoading } = useStore();
+  const navigate = useNavigate();
   const [form, setForm] = useState({
-    name: "",
-    code: "",
-    manager: "",
-    email: "",
-    phone: "",
-    budget: "",
-    location: "",
-    description: "",
-    establishedDate: "",
-    status: "Active",
+    dep_name: "",
+    gross_salary: "",
+    total_deduction: "",
   });
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Department Data:", form);
+    if (!form.dep_name || !form.gross_salary || !form.total_deduction) {
+      return toast.error("Please fill in all required fields");
+    }
+
+    const res = await addDepartment(form);
+    if (res.success) {
+      toast.success("Department created successfully!");
+      navigate("/departments");
+    } else {
+      toast.error(res.message || "Failed to create department");
+    }
   };
 
   return (
     <div className="min-h-screen p-6 flex items-center justify-center">
-
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-4xl bg-white border rounded-2xl shadow-xl p-6"
+        className="w-full max-w-2xl bg-white border rounded-2xl shadow-xl p-8"
       >
-
         {/* Header */}
-        <div className="mb-6">
+        <div className="mb-8">
           <h1 className="text-2xl font-bold text-slate-800 flex items-center gap-2">
             <Building2 className="text-blue-500" />
             Add New Department
           </h1>
           <p className="text-slate-500 text-sm">
-            Create and manage company departments in EPMS
+            Define department name and base salary rules
           </p>
         </div>
 
-        {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
+        {/* Form Fields */}
+        <div className="space-y-6">
           {/* Department Name */}
           <div>
-            <label className="text-sm text-slate-600">
-              Department Name
+            <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+              <Briefcase className="size-4" /> Department Name
             </label>
             <input
-              name="name"
-              value={form.name}
+              name="dep_name"
+              required
+              value={form.dep_name}
               onChange={handleChange}
-              placeholder="Human Resources"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
+              placeholder="e.g. Engineering, Sales, HR"
+              className="w-full px-4 py-3 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
             />
           </div>
 
-          {/* Department Code */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Hash className="size-4" /> Department Code
-            </label>
-            <input
-              name="code"
-              value={form.code}
-              onChange={handleChange}
-              placeholder="HR-001"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Gross Salary */}
+            <div>
+              <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+                <DollarSign className="size-4" /> Base Gross Salary
+              </label>
+              <input
+                type="number"
+                name="gross_salary"
+                required
+                value={form.gross_salary}
+                onChange={handleChange}
+                placeholder="5000"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+              />
+            </div>
 
-          {/* Manager */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <User className="size-4" /> Department Manager
-            </label>
-            <input
-              name="manager"
-              value={form.manager}
-              onChange={handleChange}
-              placeholder="John Doe"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
+            {/* Total Deduction */}
+            <div>
+              <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+                <DollarSign className="size-4" /> Standard Deduction
+              </label>
+              <input
+                type="number"
+                name="total_deduction"
+                required
+                value={form.total_deduction}
+                onChange={handleChange}
+                placeholder="500"
+                className="w-full px-4 py-3 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+              />
+            </div>
           </div>
-
-          {/* Manager Email */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Mail className="size-4" /> Manager Email
-            </label>
-            <input
-              type="email"
-              name="email"
-              value={form.email}
-              onChange={handleChange}
-              placeholder="manager@company.com"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
-
-          {/* Phone */}
-          <div>
-            <label className="text-sm text-slate-600">
-              Phone Number
-            </label>
-            <input
-              name="phone"
-              value={form.phone}
-              onChange={handleChange}
-              placeholder="+250 7xx xxx xxx"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
-
-          {/* Budget */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <DollarSign className="size-4" /> Department Budget
-            </label>
-            <input
-              type="number"
-              name="budget"
-              value={form.budget}
-              onChange={handleChange}
-              placeholder="50000"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
-
-          {/* Location */}
-          <div>
-            <label className="text-sm text-slate-600">
-              Location
-            </label>
-            <input
-              name="location"
-              value={form.location}
-              onChange={handleChange}
-              placeholder="Head Office - Kigali"
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
-
-          {/* Established Date */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Calendar className="size-4" /> Established Date
-            </label>
-            <input
-              type="date"
-              name="establishedDate"
-              value={form.establishedDate}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            />
-          </div>
-
-          {/* Status */}
-          <div>
-            <label className="text-sm text-slate-600 flex items-center gap-1">
-              <Shield className="size-4" /> Status
-            </label>
-            <select
-              name="status"
-              value={form.status}
-              onChange={handleChange}
-              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-            >
-              <option>Active</option>
-              <option>Inactive</option>
-            </select>
-          </div>
-        </div>
-
-        {/* Description */}
-        <div className="mt-4">
-          <label className="text-sm text-slate-600 flex items-center gap-1">
-            <FileText className="size-4" /> Description
-          </label>
-          <textarea
-            name="description"
-            value={form.description}
-            onChange={handleChange}
-            rows="4"
-            placeholder="Describe department responsibilities..."
-            className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100"
-          />
         </div>
 
         {/* Submit */}
         <button
           type="submit"
-          className="mt-6 w-full py-3 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold shadow-md hover:scale-105 transition"
+          disabled={isLoading}
+          className="mt-10 w-full py-4 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 text-white font-semibold shadow-lg hover:scale-[1.02] active:scale-[0.98] transition disabled:opacity-50 disabled:hover:scale-100 flex items-center justify-center gap-2"
         >
-          Save Department
+          {isLoading && <Loader2 className="animate-spin size-5" />}
+          {isLoading ? "Creating..." : "Save Department"}
         </button>
       </form>
     </div>
