@@ -7,7 +7,13 @@ const api = axios.create({
   baseURL: API_BASE_URL,
 });
 
-export const useStore = create((set) => ({
+// Initialize token from localStorage
+const token = localStorage.getItem('token');
+if (token) {
+  api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+}
+
+export const useStore = create((set, get) => ({
   user: JSON.parse(localStorage.getItem('user')) || null,
   departments: [],
   employees: [],
@@ -19,20 +25,103 @@ export const useStore = create((set) => ({
   login: async (email, password) => {
     set({ isLoading: true });
     try {
-      // For now, allow any admin login if backend auth isn't fully ready
-      const user = { email, role: 'admin', name: 'Admin User' };
+      const response = await api.post('/auth/login', { email, password });
+      const { token, user } = response.data;
+      
+      localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      
+      // Set default header for future requests
+      api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+      
       set({ user, isLoading: false });
       return { success: true };
     } catch (error) {
       set({ isLoading: false });
-      return { success: false, message: 'Login failed' };
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Login failed' 
+      };
+    }
+  },
+
+  signup: async (username, email, password) => {
+    set({ isLoading: true });
+    try {
+      await api.post('/auth/signup', { username, email, password });
+      set({ isLoading: false });
+      return { success: true };
+    } catch (error) {
+      set({ isLoading: false });
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Signup failed' 
+      };
     }
   },
 
   logout: () => {
     localStorage.removeItem('user');
+    localStorage.removeItem('token');
+    delete api.defaults.headers.common['Authorization'];
     set({ user: null });
+  },
+
+  updateProfile: async (profileData) => {
+    set({ isLoading: true });
+    try {
+      const response = await api.put('/auth/profile', profileData);
+      const { user } = response.data;
+      localStorage.setItem('user', JSON.stringify(user));
+      set({ user, isLoading: false });
+      return { success: true };
+    } catch (error) {
+      set({ isLoading: false });
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Failed to update profile' 
+      };
+    }
+  },
+
+  changePassword: async (passwords) => {
+    set({ isLoading: true });
+    try {
+      await api.put('/auth/change-password', passwords);
+      set({ isLoading: false });
+      return { success: true };
+    } catch (error) {
+      set({ isLoading: false });
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Failed to change password' 
+      };
+    }
+  },
+
+  uploadAvatar: async (file) => {
+    set({ isLoading: true });
+    try {
+      const formData = new FormData();
+      formData.append('avatar', file);
+      
+      const response = await api.post('/auth/avatar', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      
+      const { avatar } = response.data;
+      const updatedUser = { ...get().user, avatar };
+      localStorage.setItem('user', JSON.stringify(updatedUser));
+      set({ user: updatedUser, isLoading: false });
+      
+      return { success: true, avatar };
+    } catch (error) {
+      set({ isLoading: false });
+      return { 
+        success: false, 
+        message: error.response?.data?.message || 'Failed to upload avatar' 
+      };
+    }
   },
 
   // Dashboard Stats
@@ -50,7 +139,7 @@ export const useStore = create((set) => ({
     set({ isLoading: true });
     try {
       const response = await api.get('/department');
-      set({ departments: response.data, isLoading: false });
+      set({ departments: response.data.depData, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
     }
@@ -103,7 +192,7 @@ export const useStore = create((set) => ({
     set({ isLoading: true });
     try {
       const response = await api.get('/employee');
-      set({ employees: response.data, isLoading: false });
+      set({ employees: response.data.empData, isLoading: false });
     } catch (error) {
       set({ isLoading: false });
     }

@@ -8,13 +8,18 @@ import {
   LogIn,
   UserPlus,
 } from "lucide-react";
+import { useStore } from "../store/useStore";
+import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
 export default function AuthPage() {
   const [isLogin, setIsLogin] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const { login, signup, isLoading } = useStore();
+  const navigate = useNavigate();
 
   const [form, setForm] = useState({
-    fullName: "",
+    username: "",
     email: "",
     password: "",
     confirmPassword: "",
@@ -24,15 +29,31 @@ export default function AuthPage() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!isLogin && form.password !== form.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
-    console.log(isLogin ? "LOGIN" : "SIGNUP", form);
+    if (isLogin) {
+      const res = await login(form.email, form.password);
+      if (res.success) {
+        toast.success("Welcome back!");
+        navigate("/");
+      } else {
+        toast.error(res.message);
+      }
+    } else {
+      const res = await signup(form.username, form.email, form.password);
+      if (res.success) {
+        toast.success("Account created! Please login.");
+        setIsLogin(true);
+      } else {
+        toast.error(res.message);
+      }
+    }
   };
 
   return (
@@ -91,18 +112,18 @@ export default function AuthPage() {
           {/* FORM */}
           <form onSubmit={handleSubmit} className="space-y-4" >
 
-            {/* FULL NAME (SIGNUP ONLY) */}
+            {/* USERNAME (SIGNUP ONLY) */}
             {!isLogin && (
               <div >
                 <label className="text-sm text-slate-600 flex items-center gap-1">
-                  <User className="size-4" /> Full Name
+                  <User className="size-4" /> Username
                 </label>
                 <input
-                  name="fullName"
-                  value={form.fullName}
+                  name="username"
+                  value={form.username}
                   onChange={handleChange}
                   className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-100 outline-none"
-                  placeholder="John Doe"
+                  placeholder="john_doe"
                 />
               </div>
             )}
