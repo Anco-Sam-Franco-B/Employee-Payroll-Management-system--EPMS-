@@ -60,7 +60,7 @@ export const ViewDepEmp = async (req, res) => {
 
 export const createEmp = async (req, res) => {
     const { depId } = req.params;
-    const { fname, lname, position, address, telphone, gender, heredDate } = req.body;
+    const { fname, lname, position, address, telphone, gender, heredDate, status } = req.body;
 
     if (!depId) return res.status(400).json({ message: 'Department ID is required' });
     if (!fname || !lname || !position || !address || !telphone || !gender || !heredDate) {
@@ -69,8 +69,9 @@ export const createEmp = async (req, res) => {
 
     try {
         const empNumber = 'EMP' + generateEmpNumber();
-        const sql = 'INSERT INTO employee(dep_id, emp_number, fname, lname, position, address, telephone, gender, hered_date, create_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())';
-        await db.promise().query(sql, [depId, empNumber, fname, lname, position, address, telphone, gender, heredDate]);
+        const empStatus = status || 'Active';
+        const sql = 'INSERT INTO employee(dep_id, emp_number, fname, lname, position, address, telephone, gender, hered_date, status, create_at) VALUES(?, ?, ?, ?, ?, ?, ?, ?, ?, ?, NOW())';
+        await db.promise().query(sql, [depId, empNumber, fname, lname, position, address, telphone, gender, heredDate, empStatus]);
 
         return res.status(201).json({ message: 'Employee created!' });
     } catch (error) {
@@ -98,13 +99,14 @@ export const deleteEmp = async (req, res) => {
 
 export const updateEmp = async (req, res) => {
     const { empId } = req.params;
-    const { fname, lname, position, address, telphone, gender, heredDate, depId } = req.body;
+    const { fname, lname, position, address, telphone, gender, heredDate, depId, status } = req.body;
 
     if (!empId) return res.status(400).json({ message: 'Employee ID is required' });
 
     try {
-        const sql = 'UPDATE employee SET fname=?, lname=?, position=?, address=?, telephone=?, gender=?, hered_date=?, dep_id=? WHERE id=?';
-        await db.promise().query(sql, [fname, lname, position, address, telphone, gender, heredDate, depId, empId]);
+        const empStatus = status || 'Active';
+        const sql = 'UPDATE employee SET fname=?, lname=?, position=?, address=?, telephone=?, gender=?, hered_date=?, dep_id=?, status=? WHERE id=?';
+        await db.promise().query(sql, [fname, lname, position, address, telphone, gender, heredDate, depId, empStatus, empId]);
 
         return res.status(200).json({ message: 'Employee updated!' });
     } catch (error) {

@@ -18,9 +18,17 @@ DROP TABLE IF EXISTS admin CASCADE;
 
 CREATE TABLE admin (
     id SERIAL PRIMARY KEY,
+    username VARCHAR(255) NOT NULL,
     email VARCHAR(230) NOT NULL,
-    password INTEGER NOT NULL,
-    cresated_at INTEGER NOT NULL
+    password VARCHAR(255) NOT NULL,
+    phone VARCHAR(20),
+    role VARCHAR(50) DEFAULT 'Super Admin',
+    department VARCHAR(255),
+    location VARCHAR(255),
+    status VARCHAR(20) DEFAULT 'Active',
+    bio TEXT,
+    avatar VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 -- =====================================================
@@ -44,7 +52,7 @@ CREATE TABLE department (
 CREATE TABLE employee (
     id SERIAL PRIMARY KEY,
     dep_id INTEGER NOT NULL,
-    dep_number INTEGER NOT NULL,
+    emp_number VARCHAR(50) NOT NULL,
     fname VARCHAR(255) NOT NULL,
     lname VARCHAR(255) NOT NULL,
     position VARCHAR(255) NOT NULL,
@@ -52,6 +60,7 @@ CREATE TABLE employee (
     telephone VARCHAR(18) NOT NULL,
     gender VARCHAR(20) NOT NULL,
     hered_date DATE NOT NULL,
+    status VARCHAR(20) DEFAULT 'Active',
     create_at TIMESTAMP NOT NULL,
     updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
@@ -108,3 +117,31 @@ ON salary(emp_id);
 -- 3. ON UPDATE CURRENT_TIMESTAMP behavior in PostgreSQL usually requires triggers.
 -- 4. Foreign key constraints added explicitly.
 -- 5. Schema structure kept identical to the original MySQL version.
+
+-- =====================================================
+-- Triggers for ON UPDATE CURRENT_TIMESTAMP
+-- =====================================================
+
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE OR REPLACE FUNCTION update_update_date_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.update_date = CURRENT_TIMESTAMP;
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+CREATE TRIGGER update_employee_modtime
+BEFORE UPDATE ON employee
+FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
+
+CREATE TRIGGER update_department_modtime
+BEFORE UPDATE ON department
+FOR EACH ROW EXECUTE FUNCTION update_update_date_column();

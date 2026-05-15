@@ -24,6 +24,7 @@ export default function AddEmployeeForm() {
     gender: "Male",
     heredDate: "",
     depId: "",
+    status: "Active",
   });
 
   useEffect(() => {
@@ -186,6 +187,22 @@ export default function AddEmployeeForm() {
             >
               <option>Male</option>
               <option>Female</option>
+            </select>
+          </div>
+
+          {/* Status */}
+          <div>
+            <label className="text-sm text-slate-600 font-medium">Status</label>
+            <select
+              name="status"
+              required
+              value={form.status}
+              onChange={handleChange}
+              className="w-full mt-1 px-3 py-2 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+            >
+              <option>Active</option>
+              <option>Inactive</option>
+              <option>On Leave</option>
             </select>
           </div>
         </div>
