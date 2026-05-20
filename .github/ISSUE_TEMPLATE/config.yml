@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security Reports
+    url: https://github.com/Anco-Sam-Franco-B
+    about: Please report security vulnerabilities privately.
