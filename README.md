@@ -539,7 +539,7 @@ copyright notice and this permission notice appear in all copies.
 
 **Sam Franco BYIRINGIRO**
 - 🔗 [GitHub Profile](https://github.com/Anco-Sam-Franco-B)
-- 📧 Email: [Contact]
+- 📧 Email: [Contact](+250792411359)
 - 💼 LinkedIn: [Profile]
 
 ---
