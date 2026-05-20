@@ -17,6 +17,7 @@ import AddDepartmentForm from './pages/AddDepartment'
 import EditEmployeeForm from './pages/EditEmployee'
 import EditDepartmentForm from './pages/EditDepartment'
 import AdminProfile from './pages/AdminProfile'
+import EmployeeProfile from './pages/EmployeeProfile'
 
 function App() {
 
@@ -43,6 +44,7 @@ function App() {
             <Route path='/create-employee' element={<AddEmployeeForm/>} />
             <Route path='/create-department' element={<AddDepartmentForm/>} />
             <Route path='/edit-employee/:id' element={<EditEmployeeForm/>} />
+            <Route path='/employee/profile/:empNumber/ID/:id' element={<EmployeeProfile/>} />
             <Route path='/edit-department/:id' element={<EditDepartmentForm/>} />
             <Route path='/profile' element={<AdminProfile/>} />
         </Route>

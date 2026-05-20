@@ -37,7 +37,7 @@ export default function Employees() {
   return (
     <div className="p-6 min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div data-aos='fade-down' className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">Employees</h1>
           <p className="text-slate-500 text-sm">Manage employee records in table view</p>
@@ -49,7 +49,7 @@ export default function Employees() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white border rounded-2xl p-4 shadow-sm flex flex-col lg:flex-row gap-4 mb-6">
+      <div data-aos='fade-up' className="bg-white border rounded-2xl p-4 shadow-sm flex flex-col lg:flex-row gap-4 mb-6">
         <div className="flex items-center gap-2 w-full lg:w-1/3 px-3 py-2 rounded-xl bg-slate-100">
           <Search className="size-4 text-slate-500" />
           <input
@@ -75,12 +75,13 @@ export default function Employees() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border rounded-2xl shadow-sm overflow-hidden">
+      <div data-aos='fade-up' className="bg-white border rounded-2xl shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-slate-100 text-slate-600">
               <tr>
                 <th className="text-left p-4">Employee</th>
+                <th className="text-left p-4">Code</th>
                 <th className="text-left p-4">Department</th>
                 <th className="text-left p-4">Role</th>
                 <th className="text-left p-4">Contact</th>
@@ -96,29 +97,44 @@ export default function Employees() {
               ) : filtered.length > 0 ? (
                 filtered.map((emp) => (
                   <tr key={emp.id} className="border-t hover:bg-slate-50 transition">
+
                     <td className="p-4 flex items-center gap-3">
                       <div className="w-9 h-9 rounded-xl bg-gradient-to-r from-blue-500 to-green-500 flex items-center justify-center text-white font-bold">
                         {emp.fname[0]}
+                        {emp.lname[0]}
                       </div>
                       <span className="font-medium text-slate-700">{emp.fname} {emp.lname}</span>
                     </td>
+                    <td className="p-4 text-slate-600 font-medium">{emp.emp_number}</td>
                     <td className="p-4 text-slate-600">{emp.dep_name}</td>
                     <td className="p-4 text-slate-600">{emp.position}</td>
                     <td className="p-4 text-slate-600">{emp.telephone}</td>
                     <td className="p-4">
-                      <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600">
-                        Active
-                      </span>
+                      {
+                        emp.status === 'Active' ? (
+                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-600">
+                            {emp.status}
+                          </span>
+                        ) : emp.status === 'Inactive'? (
+                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-600">
+                            {emp.status}
+                          </span>
+                        ) : (
+                          <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-600">
+                            {emp.status}
+                          </span>
+                        )
+                      }
                     </td>
                     <td className="p-4 text-right">
                       <div className="flex justify-end gap-2">
-                        <button className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200">
+                        <Link to={`/employee/profile/${emp.emp_number}/ID/${emp.id}`} className="p-2 rounded-lg bg-slate-100 hover:bg-slate-200">
                           <Eye className="size-4" />
-                        </button>
+                        </Link>
                         <Link to={`/edit-employee/${emp.id}`} className="p-2 rounded-lg bg-blue-50 text-blue-600 hover:bg-blue-100">
                           <Pencil className="size-4" />
                         </Link>
-                        <button 
+                        <button
                           onClick={() => handleDelete(emp.id)}
                           className="p-2 rounded-lg bg-red-50 text-red-600 hover:bg-red-100"
                         >

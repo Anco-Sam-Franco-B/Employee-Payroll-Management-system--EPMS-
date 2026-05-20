@@ -22,7 +22,7 @@ export default function Dashboard() {
     <div className="p-6 min-h-screen bg-slate-50/50">
 
       {/* Header */}
-      <div className="mb-8 flex items-center justify-between">
+      <div data-aos='fade-zome' className="mb-8 flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">
             Dashboard
@@ -73,7 +73,7 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-8">
 
         {/* Chart Section */}
-        <div className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+        <div data-aos='fade-right' className="lg:col-span-2 bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-8">
             <div>
               <h2 className="text-lg font-bold text-slate-800">Department Distribution</h2>
@@ -84,7 +84,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="space-y-6">
+          <div data-aos='fade-zome' className="space-y-6">
             {stats?.departmentDistribution?.map((item, index) => (
               <div key={index} className="group">
                 <div className="flex justify-between text-sm mb-2">
@@ -111,7 +111,7 @@ export default function Dashboard() {
         </div>
 
         {/* Activity Section */}
-        <div className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
+        <div data-aos='fade-left' className="bg-white border border-slate-200 rounded-3xl p-6 shadow-sm">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-lg font-bold text-slate-800">Recent Activity</h2>
             <button className="text-blue-500 text-xs font-bold hover:underline flex items-center gap-1">
@@ -155,7 +155,7 @@ function StatCard({ icon, label, value, color }) {
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
+    <div data-aos='fade-zome-in' className="bg-white rounded-3xl border border-slate-200 p-6 shadow-sm hover:shadow-xl hover:-translate-y-1 transition-all duration-300 group">
       <div className={`p-4 rounded-2xl w-fit mb-4 transition-transform group-hover:scale-110 ${colorMap[color]}`}>
         {icon}
       </div>
@@ -166,4 +166,4 @@ function StatCard({ icon, label, value, color }) {
     </div>
   );
 }
-
+

@@ -13,9 +13,10 @@ export default function AddDepartmentForm() {
   const { addDepartment, isLoading } = useStore();
   const navigate = useNavigate();
   const [form, setForm] = useState({
-    dep_name: "",
-    gross_salary: "",
-    total_deduction: "",
+    depCode: "",
+    depName: "",
+    grossSalary: "",
+    totalDeduction: "",
   });
 
   const handleChange = (e) => {
@@ -24,7 +25,7 @@ export default function AddDepartmentForm() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!form.dep_name || !form.gross_salary || !form.total_deduction) {
+    if (!form.depName  || !form.depCode || !form.grossSalary || !form.totalDeduction) {
       return toast.error("Please fill in all required fields");
     }
 
@@ -38,7 +39,7 @@ export default function AddDepartmentForm() {
   };
 
   return (
-    <div className="min-h-screen p-6 flex items-center justify-center">
+    <div data-aos='fade-down' className="min-h-screen p-6 flex items-center justify-center">
       <form
         onSubmit={handleSubmit}
         className="w-full max-w-2xl bg-white border rounded-2xl shadow-xl p-8"
@@ -56,19 +57,36 @@ export default function AddDepartmentForm() {
 
         {/* Form Fields */}
         <div className="space-y-6">
-          {/* Department Name */}
-          <div>
-            <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
-              <Briefcase className="size-4" /> Department Name
-            </label>
-            <input
-              name="dep_name"
-              required
-              value={form.dep_name}
-              onChange={handleChange}
-              placeholder="e.g. Engineering, Sales, HR"
-              className="w-full px-4 py-3 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
-            />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Department Name */}
+              <div>
+                <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+                  <Briefcase className="size-4" /> Department Name
+                </label>
+                <input
+                  name="depName"
+                  required
+                  value={form.depName}
+                  onChange={handleChange}
+                  placeholder="e.g. Engineering, Sales, HR"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+                />
+              </div>
+
+              {/* Department code */}
+              <div>
+                <label className="text-sm text-slate-600 font-medium flex items-center gap-1 mb-1">
+                  <Briefcase className="size-4" /> Department Code
+                </label>
+                <input
+                  name="depCode"
+                  required
+                  value={form.depCode}
+                  onChange={handleChange}
+                  placeholder="e.g. HR, CW"
+                  className="w-full px-4 py-3 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
+                />
+              </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -79,9 +97,9 @@ export default function AddDepartmentForm() {
               </label>
               <input
                 type="number"
-                name="gross_salary"
+                name="grossSalary"
                 required
-                value={form.gross_salary}
+                value={form.grossSalary}
                 onChange={handleChange}
                 placeholder="5000"
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"
@@ -95,9 +113,9 @@ export default function AddDepartmentForm() {
               </label>
               <input
                 type="number"
-                name="total_deduction"
+                name="totalDeduction"
                 required
-                value={form.total_deduction}
+                value={form.totalDeduction}
                 onChange={handleChange}
                 placeholder="500"
                 className="w-full px-4 py-3 rounded-xl bg-slate-50 border focus:border-blue-500 outline-none transition"

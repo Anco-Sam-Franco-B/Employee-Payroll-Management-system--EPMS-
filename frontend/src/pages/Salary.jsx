@@ -34,7 +34,7 @@ export default function SalaryPage() {
   return (
     <div className="p-6 min-h-screen">
       {/* Header */}
-      <div className="flex items-center justify-between mb-6">
+      <div data-aos='fade' className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">
             Salary Management
@@ -50,7 +50,7 @@ export default function SalaryPage() {
       </div>
 
       {/* Filters */}
-      <div className="bg-white border rounded-2xl p-4 shadow-sm flex flex-col lg:flex-row gap-4 mb-6">
+      <div data-aos='fade-in' className="bg-white border rounded-2xl p-4 shadow-sm flex flex-col lg:flex-row gap-4 mb-6">
         {/* Search */}
         <div className="flex items-center gap-2 w-full lg:w-1/3 px-3 py-2 rounded-xl bg-slate-100">
           <Search className="size-4 text-slate-500" />
@@ -91,7 +91,7 @@ export default function SalaryPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white border rounded-2xl shadow-sm overflow-hidden overflow-x-auto">
+      <div data-aos='fade-right' className="bg-white border rounded-2xl shadow-sm overflow-hidden overflow-x-auto">
         <table className="w-full text-sm min-w-[800px]">
           <thead className="bg-slate-100 text-slate-600">
             <tr>

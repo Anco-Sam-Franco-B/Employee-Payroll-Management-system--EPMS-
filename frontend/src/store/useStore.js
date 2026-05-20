@@ -20,6 +20,7 @@ export const useStore = create((set, get) => ({
   salaries: [],
   stats: null,
   isLoading: false,
+  isAuthenticated: localStorage.getItem('auth') || false,
 
   // Auth
   login: async (email, password) => {
@@ -30,18 +31,21 @@ export const useStore = create((set, get) => ({
       
       localStorage.setItem('token', token);
       localStorage.setItem('user', JSON.stringify(user));
+      localStorage.setItem('auth', true)
       
       // Set default header for future requests
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       
-      set({ user, isLoading: false });
+      set({ user, isLoading: false }); 
       return { success: true };
     } catch (error) {
       set({ isLoading: false });
+      console.log(error.response)
       return { 
         success: false, 
         message: error.response?.data?.message || 'Login failed' 
       };
+      
     }
   },
 
@@ -63,6 +67,7 @@ export const useStore = create((set, get) => ({
   logout: () => {
     localStorage.removeItem('user');
     localStorage.removeItem('token');
+    localStorage.removeItem('auth')
     delete api.defaults.headers.common['Authorization'];
     set({ user: null });
   },
@@ -178,7 +183,7 @@ export const useStore = create((set, get) => ({
   fetchDepartmentById: async (id) => {
     set({ isLoading: true });
     try {
-      const response = await api.get(`/department/details/${id}`);
+      const response = await api.get(`/department/${id}`);
       set({ isLoading: false });
       return response.data.depData[0];
     } catch (error) {
@@ -231,12 +236,14 @@ export const useStore = create((set, get) => ({
   fetchEmployeeById: async (id) => {
     set({ isLoading: true });
     try {
-      const response = await api.get(`/employee/details/${id}`);
+      const response = await api.get(`/employee/${id}`);
       set({ isLoading: false });
       return response.data.empData[0];
     } catch (error) {
+      console.log(error.response)
       set({ isLoading: false });
       return null;
+      
     }
   },
 
